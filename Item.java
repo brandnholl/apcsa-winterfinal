@@ -1,24 +1,30 @@
-public class Item {
-    private String itemName;
-    private String itemDescription;
+public class Item{
+    //instance variables
+    private String name;
+    public boolean pickedUp;
+    private String description;
 
-    private Boolean hasItem;
-
-    public Item(String itemName, String itemDescription, Boolean hasItem) {
-        this.itemName = itemName;
-        this.itemDescription = itemDescription;
-        this.hasItem = hasItem;
+    //constructor
+    public Item(String name, boolean pickedUp, String description){
+        this.name = name;
+        this.pickedUp = pickedUp;
+        this.description = description;
     }
 
-    public String getItemName() {
-        return itemName;
+    //accessor methods
+    public String getName(){
+        return name;
     }
 
-    public String getItemDescription() {
-        return itemDescription;
+    public boolean getPickedUp(){
+        return pickedUp;
     }
 
-    public Boolean getItemStatus() {
-        return hasItem;
+    public String getDescription(){
+        return description;
+    }
+
+    public void pickUp(){
+        pickedUp = true;
     }
 }

@@ -1,21 +1,49 @@
-class Room {
-    private String[] views;
-    private Item[] items;
+public class Room {
+    //instance variables
+    private String name;
+    private String description;
 
-    public Room(String[] views, Item[] items) {
-        this.views = views;
-        this.items = items;
+    private Room toEast;
+    private Room toWest;
+    private Room toNorth;
+    private Room toSouth;
+
+    //constructor
+    public Room(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
-    public String getView(int direction) {
-        return views[direction];
+    //set each room's directions
+    public void setRooms(Room toNorth, Room toSouth, Room toEast, Room toWest) {
+        this.toNorth = toNorth;
+        this.toSouth = toSouth;
+        this.toEast = toEast;
+        this.toWest = toWest;
     }
 
-    public Item[] getItems() {
-        return items;
+    //access name
+    public String getName() {
+        return name;
     }
-
-    public void removeItem(Item item) {
-        // Remove the item from the room
+    // access room description
+    public String getDescription() {
+        return description;
+    }
+    //north
+    public Room getToNorth() {
+        return toNorth;
+    }
+    //south
+    public Room getToSouth() {
+        return toSouth;
+    }
+    //east
+    public Room getToEast() {
+        return toEast;
+    }
+    //west
+    public Room getToWest() {
+        return toWest;
     }
 }
