@@ -1,9 +1,10 @@
 import java.util.Scanner;
-import java.util.Random;
 
 class Main {
     private static Room currentRoom; //currentRoom is the room the user is in at each moment
     private static String[] inventory = new String[3];
+    private static int playerDir;
+    private static String[] playerView;
 
     public static void main(String[] args) {
         //scanner for user input
@@ -14,227 +15,116 @@ class Main {
         Item rustykey = new Item("Rusty Key", false, "A rusty old key");
         Item goldenartifact = new Item("Artifact", false, "A shimmering golden artifact");
 
+        //room descriptions
+        String[] templeDescription = {
+                "\nYou find yourself standing in front of the entrance to the temple. The doors are made of solid bronze, depicting scenes of battle and sacrifice. The doors are framed by a series of carved pillars, each one adorned with intricate patterns and symbols. Above the doors, a stone lintel bears the inscription \"Knowledge is power.\"",
+                "\nTo your right, there's a similar path, leading away from the temple in the opposite direction. There are smaller shrubs and bushes along the side of the path, and you can see a fountain off in the distance, the sound of rushing water reaching your ears.",
+                "\nBehind you, the path you followed to get here stretches out, leading back the way you came.",
+                "\nTo your left, you see a path winding away from the temple. The path is lined with tall trees, their branches reaching up towards the sky. You can hear the rustling of leaves in the gentle breeze."
+        };
 
+        String[] hallwayDescription = {
+                "\nTo front of you at the end of a hallway, you see the entrance to a chamber. As you squint in the dimly lit hallway, you can see that this chamber is full of ancient artifacts and treasures, objects that have been lost to the world for centuries.",
+                "\nTo your right, the walls are rough and unfinished, the ancient carvings largely obscured by layers of grime and dust. The ceiling is low, and you have to duck to avoid hitting your head on the rough-hewn beams. You find a lit torch hanging on a pillar.",
+                "\nBehind you, the doorway that you came through stands ominously. Through the bright sunlight, you can make out the winding path through the trees and shrubs.",
+                "\nTo your left, the walls are adorned with intricate carvings and frescoes depicting the gods and goddesses of the ancient civilization that built the temple. The floor is made of polished marble, and the ceiling is supported by rows of massive stone columns. A faint smell of incense hangs in the air."
+        };
+
+        String[] chamberDescription = {
+                "\nIn front of you, there is a stone sarcophagus containing the remains of an ancient queen. The sarcophagus is adorned with intricate carvings and inlaid with precious gems. Above the sarcophagus is an intricate design with a key-like hole.",
+                "\nTo your right, there is a glass display case containing a collection of ancient coins. The coins are made of gold and silver, and each one is adorned with the image of a different god or goddess. The coins look extremely valuable.",
+                "\nBehind you, you can see the dimly lit hallway in which you entered. Through the shadows, you can make out some of the inscriptions on the wall.",
+                "\nTo your left, there is a stone pedestal containing a golden goblet encrusted with diamonds. The goblet is said to have belonged to an ancient king, and it is said to bring good fortune to whoever possesses it. Sandwiched in between them is a rusty bronze key."
+        };
+
+        String[] treasureroomDescription = {
+                "\nIn front of you, there is a golden chalice sitting on a pedestal in the center of the room. The chalice is made of pure gold, and it is adorned with diamonds and other precious gems. You can see your reflection in the gleaming surface of the chalice. This is the artifact you have spent your life searching for.",
+                "\nTo your right, there is a row of stone pillars supporting the ceiling. Each pillar is adorned with intricate carvings and patterns.",
+                "\nBehind you, there is a row of stone benches, each one carved with intricate patterns. The benches are meant for the priests and other officials who perform the rituals in this room.",
+                "\nTo your left, there is a stone altar adorned with intricate carvings and inlaid with precious gems. A pair of tall candles burn on either side of the altar, casting a warm glow throughout the room."
+        };
         //instantiating all rooms
-        Room outsideTemple = new Room("Outside", "You are in your bedroom. There is a top drawer and a bed you can look at");
-        Room hallway = new Room("Bathroom", "You are in your bathroom. There is a bathtub and a cupboard you can look at");
-        Room chamber = new Room("Kitchen", "You are in your kitchen. There is a left and right cabinet you can look at");
-        Room treasureRoom = new Room("Closet", "You are in your closet. There is a hamper you can look at");
+        Room outsideTemple = new Room("Outside", templeDescription);
+        Room hallway = new Room("Hallway", hallwayDescription);
+        Room chamber = new Room("Chamber", chamberDescription);
+        Room treasureRoom = new Room("Treasure Room", treasureroomDescription);
 
-        //setting rooms: has the rooms to the north, south, east, and west, and null as placeholders when there isn't a room in that direction
-        bedroom.setRooms(kitchen, null, null, bathroom);;
-        bathroom.setRooms(null, null, bedroom, null);
-        kitchen.setRooms(null, bedroom, livingRoom, closet);
-
+        playerView = templeDescription;
 
         //intro message
-        System.out.println("You wake up in the middle of the night at the sound of someone breaking into your vacation home you’re staying at. You know that there is a safe in the closet locked with a weapon inside, and if you are able to get to it, you’d be guaranteed safety. You can’t call 911 because you live in the woods, and nobody else is home because they went to hike up the mountains to watch the sunrise. You’re only way out is if you are able to get to the safe and get your secret machine gun. \n \nProblem is…you don’t remember the combination to the safe. You hid different parts of the code all over your house in case this ever happened. The code consists of 3 numbers, meaning three sheets of paper.\n You keep all your valuables in one room with booby traps, and you know that the robber will be occupied there for a bit, but not for long. If you run into him before you get the gun, you will die. I’ll be your pair of eyes to warn you of any signs he’s near. Good luck!");
-        //display commands with method
+        System.out.println("In this game, you play as a treasure hunter on a mission to find a valuable artifact that has been lost for centuries. As you explore the temple, you encounter a variety of objects and clues that help you on your quest.");
         commands();
+        currentRoom = outsideTemple;
+        while (!goldenartifact.pickedUp) {
 
-        //first test of input: having them input their name
-        System.out.print("What is your name?: ");
-        String name = input.nextLine(); //saved as a variable
-        System.out.println("Hello " + name + "!\n"); //prints a little greeting message
-
-        //starting room is the bedroom
-        currentRoom = bedroom;
-        //only loops if the gun has not been picked up (game ends)
-        while(!goldenartifact.pickedUp){
             System.out.println();
-            //first checks if the user is in the secret room. if they are, they are confronted by the burglar and they die, and the game ends (loop breaks)
+            System.out.println(playerView[playerDir]);
+            String askUser = input.nextLine();
 
-            //also prints the description of the room (what there is to look at or take)
-            System.out.println(currentRoom.getDescription() + "\n");
-
-            //prints the user's inventory
-            System.out.println();
-            System.out.print("Inventory: ");
-            //for every item in the inventory that isn't null, print
-            for (String item : inventory) {
-                if (item != null) {
-                    System.out.print(item + ", ");
+            if (askUser.equals("turn left")) {
+                playerDir = playerDir - 1;
+                if (playerDir < 0) {
+                    playerDir = 3;
                 }
-            }
-            System.out.println();
-
-            //if the user is in the safe room, they can open the safe with the right code and get the gun
-
-            //user input of what action they want
-            System.out.print("What would you like to do?: ");
-
-            //inputDirection is the variable holding this main input
-            String inputAction = input.nextLine();
-
-            System.out.println("──────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
-            //WASD controls the directions, respectively
-            if (inputAction.equals("W")) {
-                //each condition also checks to make sure there is a room in the direction the user wants to go. if there isn't it prints an "error message"
-                if(currentRoom.getToNorth() != null){
-                    currentRoom = currentRoom.getToNorth();
+                System.out.println(playerView[playerDir]);
+            } else if (askUser.equals("turn right")) {
+                playerDir = playerDir + 1;
+                if (playerDir > 3) {
+                    playerDir = 0;
                 }
-                else{
-                    System.out.println("There's nothing that way\n");
+                System.out.println(playerView[playerDir]);
+            } else if (askUser.equals("turn around")) {
+                playerDir = playerDir + 2;
+                if (playerDir > 3) {
+                    playerDir = playerDir - 4;
                 }
+                System.out.println(playerView[playerDir]);
             }
 
-            else if (inputAction.equals("A")) {
-                if(currentRoom.getToWest() != null){
-                    currentRoom = currentRoom.getToWest();        }
-                else{
-                    System.out.println("There's nothing that way\n");
+            // take logic
+            else if (askUser.equals("take")) {
+                if (playerView[playerDir].equals(hallwayDescription[1])) {
+                    if (!torch.pickedUp) {
+                        torch.pickUp();
+                        inventory[1] = "Torch\n";
+                        System.out.println("\nYou obtained a torch");
+                    }
+                }
+                if (playerView[playerDir].equals(chamberDescription[3])) {
+                    if (!rustykey.pickedUp) {
+                        rustykey.pickUp();
+                        inventory[1] = "Key\n";
+                        System.out.println("\nYou obtained a key");
+                    }
                 }
             }
-
-            else if (inputAction.equals("S")) {
-                if(currentRoom.getToSouth() != null){
-                    currentRoom = currentRoom.getToSouth();
-                }
-                else{
-                    System.out.println("There's nothing that way\n");
-                }
-            }
-
-            else if (inputAction.equals("D")) {
-                if(currentRoom.getToEast() != null){
-                    currentRoom = currentRoom.getToEast();
-                }
-                else{
-                    System.out.println("There's nothing that way\n");
-                }
-            }
-            //the method for the user to get a description of the things in the room: if they input to look around
-            else if(inputAction.equals("look around")){
-                System.out.println();
-                //each room has a different description of the different items, and it also prints differently if the user has certain items
-                if(currentRoom == bedroom){
-                    //if the user has the red key, it prints that the drawer is unlocked, if they don't it prints that it is locked
-                    if(redLock.pickedUp == false){
-                        System.out.println("The top drawer has a red lock, there is nothing on the bed");
-                    }
-                    else if (redLock.pickedUp == true && card3.pickedUp == false){
-                        System.out.println("There is a card inside the top drawer");
-                    }
-                    else{
-                        System.out.println("There is nothing in the bedroom");
-                    }
-                }
-                if(currentRoom == bathroom){
-                    if(card1.pickedUp == false){
-                        System.out.println("The bathtub is empty, there is a card sitting in the cupboard");
-                    }
-                    else{
-                        System.out.println("The bathtub and the cupboard is empty");
-                    }
-                }
-                //some rooms have no items inside
-                if(currentRoom == kitchen){
-                    System.out.println("There is nothing in either cabinet");
-                }
-                if(currentRoom == closet){
-                    if(redKey.pickedUp == false){
-                        System.out.println("The hamper has a red key inside");
-                    }
-                    else{
-                        System.out.println("The hamper is empty");
-                    }
-                }
-                if(currentRoom == garage){
-                    if(carKey.pickedUp == false){
-                        System.out.println("The car is locked, there is nothing on the shelf");
-                    }
-                    else if (card2.pickedUp == false){
-                        System.out.println("There is a card on the car seat and there is nothing on the shelf");
-                    }
-                    else{
-                        System.out.println("There is nothing interesting in the garage");
-                    }
-                }
-                if(currentRoom == balcony){
-                    if(carKey.pickedUp == false){
-                        System.out.println("The bin is has your car key, there is nothing on the floor");
-                    }
-                    else{
-                        System.out.println("The bin is empty, there is nothing on the floor");
-                    }
-                }
-                if(currentRoom == livingRoom){
-                    System.out.println("There is nothing interesting to see in the living room");
+            //move logic
+            if (askUser.equals("move")) {
+                if (playerView[playerDir].equals(templeDescription[0])) {
+                    playerView = hallwayDescription;
+                    System.out.println(playerView[playerDir]);
+                } else if (playerView[playerDir].equals(hallwayDescription[0]) && torch.pickedUp) {
+                    playerView = chamberDescription;
+                    System.out.println(playerView[playerDir]);
+                } else if (playerView[playerDir].equals(hallwayDescription[0]) && !torch.pickedUp) {
+                    System.out.println("The room ahead looks a little dark, see if you can find something that will help you see a little better.");
+                } else if (playerView[playerDir].equals(chamberDescription[0]) && rustykey.pickedUp) {
+                    playerView = treasureroomDescription;
+                    System.out.println(playerView[playerDir]);
+                    goldenartifact.pickUp();
+                } else if (playerView[playerDir].equals(chamberDescription[0]) && !rustykey.pickedUp) {
+                    System.out.println("You can't seem to find a way out of this room. Maybe you can find a key that will fit in the hole somewhere in the room");
                 }
             }
-            //this is if the user wants to pick up an item
-            if (inputAction.equals("take item")){
-                //they input which item they want to take, and that is added
-                System.out.print("What would you like to take?: ");
-                String takeItem = input.nextLine();
-
-                //if they want to pick up the card in the bathroom, they can input "card" while in the bathroom
-                if(currentRoom == bathroom && takeItem.equals("card")){
-                    System.out.println();
-                    System.out.println("You picked up the card");
-                    card1.pickedUp = true;
-                    //prints the item description and adds it to the inventory
-                    System.out.println("It says: " + card1.getDescription());
-                    inventory[0] = card1.getName();
-                }
-
-                //same structure about all the other items
-                if(currentRoom == closet && takeItem.equals("red key")){
-                    System.out.println();
-                    System.out.println("You picked up the red key");
-                    redKey.pickedUp = true;
-                    System.out.println(redKey.getDescription());
-                    inventory[1] = redKey.getName();
-                }
-
-                if(currentRoom == garage && takeItem.equals("card")){
-                    System.out.println();
-                    System.out.println("You picked up the card");
-                    card2.pickedUp = true;
-                    System.out.println("It says: " + card2.getDescription());
-                    inventory[2] = card2.getName();
-                }
-
-                if(currentRoom == balcony && takeItem.equals("car key")){
-                    System.out.println();
-                    System.out.println("You picked up the car key");
-                    carKey.pickedUp = true;
-                    System.out.println("It says: " + carKey.getDescription());
-                    inventory[3] = carKey.getName();
-                }
-
-                if(currentRoom == bedroom && takeItem.equals("card")){
-                    System.out.println();
-                    System.out.println("You picked up the card");
-                    card3.pickedUp = true;
-                    System.out.println("It says: " + card3.getDescription());
-                    inventory[4] = card3.getName();
-                }
-            }
-
-            //if the user wants to use an item
-            if(inputAction.equals("use item")){
-                System.out.print("What would you like to use?: ");
-                String useItem = input.nextLine();
-                //if they want to use the red key, they can input "red key" while in the bedroom to unlock the red lock
-                if(currentRoom == bedroom && useItem.equals("red key")){
-                    redLock.pickedUp = true; //unlocks red lock
-                    redKey.pickedUp = false;
-                    //description as summary of what happened
-                    System.out.println("You have unlocked the red lock. Look around again to see what's inside");
-                }
-
-                //same thing fpr car key and car
-                if(currentRoom == garage && useItem.equals("car key")){
-                    car.pickedUp = true;
-                    carKey.pickedUp = false;
-                    System.out.println("You have unlocked the car. Look around again to see what's inside");
-                }
+            // misc logic
+            else if (askUser.equals("inventory")) {
+                System.out.println(inventory[0] + inventory[1] + inventory[2]);
             }
         }
+        System.out.println("\nThanks for playing!");
     }
-    //method to print out the commands
-    public static void commands(){
-        System.out.println("\nUse WASD to move:  Other commands: \n W = north          take item = pick up an item  \n A = east           use item = use an item \n S = south          help = list of commands \n D = west           look around = know what's in the room \n");
+
+    public static void commands() {
+        System.out.println("\nCommands:\nturn left\nturn right\nturn around\nmove\ntake\ninventory\n");
     }
 }
